@@ -14,10 +14,8 @@ def get_stock_data(symbol):
         balance_sheet = stock.balance_sheet
         
         # Debug logging
-        print("Available Balance Sheet Fields:")
+        print("\nAvailable Balance Sheet Fields:")
         print(balance_sheet.index.tolist())
-        print("\nBalance Sheet Data Sample:")
-        print(balance_sheet)
         
         if balance_sheet.empty:
             return None, None, None
@@ -25,31 +23,76 @@ def get_stock_data(symbol):
         # Get market cap
         info = stock.info
         
-        # Try different possible field names for goodwill and intangibles
+        # Initialize variables
         goodwill = 0
         intangibles = 0
+        combined_value = 0
         
-        goodwill_fields = ['Goodwill', 'GoodwillAndOtherIntangibleAssets', 'GoodWill']
-        intangible_fields = ['Intangible Assets', 'IntangibleAssets', 'OtherIntangibleAssets']
+        # Print all field values for debugging
+        print("\nSearching for intangible-related fields...")
+        for field in balance_sheet.index:
+            if any(keyword in field.lower() for keyword in ['goodwill', 'intangible']):
+                value = balance_sheet.iloc[balance_sheet.index == field, 0].values[0]
+                print(f"Found field: {field} = {value}")
         
-        for field in goodwill_fields:
+        # Check for combined field first
+        if 'GoodwillAndOtherIntangibleAssets' in balance_sheet.index:
+            combined_value = balance_sheet.iloc[balance_sheet.index == 'GoodwillAndOtherIntangibleAssets', 0].values[0]
+            print(f"\nFound combined GoodwillAndOtherIntangibleAssets: {combined_value}")
+            
+            # Try to separate goodwill and intangibles if possible
+            if 'Goodwill' in balance_sheet.index:
+                goodwill = balance_sheet.iloc[balance_sheet.index == 'Goodwill', 0].values[0]
+                intangibles = combined_value - goodwill
+                print(f"Separated values - Goodwill: {goodwill}, Intangibles: {intangibles}")
+            else:
+                # Estimate split if can't find separate goodwill
+                goodwill = combined_value * 0.6  # Estimated split
+                intangibles = combined_value * 0.4
+                print(f"Estimated split - Goodwill: {goodwill}, Intangibles: {intangibles}")
+        else:
+            # Look for separate fields
+            goodwill_fields = ['Goodwill', 'GoodWill']
+            intangible_fields = [
+                'IntangibleAssets',
+                'OtherIntangibleAssets',
+                'NetIntangibleAssets',
+                'IntangibleAssetsNet'
+            ]
+            
+            # Find goodwill
+            for field in goodwill_fields:
+                if field in balance_sheet.index:
+                    goodwill = balance_sheet.iloc[balance_sheet.index == field, 0].values[0]
+                    print(f"\nFound goodwill under field: {field} = {goodwill}")
+                    break
+            
+            # Find intangibles
+            for field in intangible_fields:
+                if field in balance_sheet.index:
+                    intangibles = balance_sheet.iloc[balance_sheet.index == field, 0].values[0]
+                    print(f"Found intangibles under field: {field} = {intangibles}")
+                    break
+        
+        # Get total debt
+        total_debt = 0
+        debt_fields = ['TotalDebt', 'Total Debt']
+        for field in debt_fields:
             if field in balance_sheet.index:
-                goodwill = balance_sheet.iloc[balance_sheet.index == field, 0].values[0]
-                print(f"Found goodwill under field: {field}")
-                break
-                
-        for field in intangible_fields:
-            if field in balance_sheet.index:
-                intangibles = balance_sheet.iloc[balance_sheet.index == field, 0].values[0]
-                print(f"Found intangibles under field: {field}")
+                total_debt = balance_sheet.iloc[balance_sheet.index == field, 0].values[0]
+                print(f"\nFound total debt under field: {field} = {total_debt}")
                 break
         
         financial_data = {
-            'Total_Debt': balance_sheet.iloc[balance_sheet.index == 'Total Debt', 0].values[0] if 'Total Debt' in balance_sheet.index else balance_sheet.iloc[balance_sheet.index == 'TotalDebt', 0].values[0],
+            'Total_Debt': total_debt,
             'Goodwill': goodwill,
             'Intangible_Assets': intangibles,
             'Market_Value': info.get('marketCap', 0)
         }
+        
+        print("\nFinal financial data:")
+        for key, value in financial_data.items():
+            print(f"{key}: {value}")
         
         return hist, financial_data, info
         
