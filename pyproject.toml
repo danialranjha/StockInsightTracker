@@ -1,0 +1,10 @@
+[project]
+name = "repl-nix-stockinsighttracker"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.11"
+dependencies = [
+    "plotly>=5.24.1",
+    "streamlit>=1.39.0",
+    "yfinance>=0.2.48",
+]
