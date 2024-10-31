@@ -17,10 +17,16 @@ st.markdown("""
     .high-debt {
         color: #ff4b4b;
         font-weight: bold;
+        font-size: 2.5em;
     }
     .normal-debt {
         color: #0f9d58;
         font-weight: bold;
+        font-size: 2.5em;
+    }
+    .debt-label {
+        font-size: 1.5em;
+        margin-bottom: 0.5em;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -47,26 +53,24 @@ def main():
             # Calculate debt ratio
             debt_ratio = calculate_debt_ratio(financial_data)
             
-            # Display company info
-            col1, col2 = st.columns(2)
-            with col1:
-                st.subheader(f"{info.get('longName', symbol)} ({symbol})")
-                st.write(f"Sector: {info.get('sector', 'N/A')}")
-            with col2:
-                if debt_ratio:
-                    ratio_color = "high-debt" if debt_ratio > 30 else "normal-debt"
-                    st.markdown(f"<h3>Debt Ratio: <span class='{ratio_color}'>{debt_ratio}%</span></h3>", 
-                              unsafe_allow_html=True)
+            # Display company info and debt ratio prominently
+            st.subheader(f"{info.get('longName', symbol)} ({symbol})")
+            st.write(f"Sector: {info.get('sector', 'N/A')}")
+            
+            # Display debt ratio prominently
+            if debt_ratio:
+                ratio_color = "high-debt" if debt_ratio > 30 else "normal-debt"
+                st.markdown("<p class='debt-label'>Debt to Assets Ratio:</p>", unsafe_allow_html=True)
+                st.markdown(f"<p class='{ratio_color}'>{debt_ratio}%</p>", unsafe_allow_html=True)
             
             # Financial metrics table
             st.subheader("Financial Metrics")
             metrics_df = pd.DataFrame({
-                'Metric': ['Long Term Debt', 'Total Assets', 'Goodwill and Intangible Assets', 'Debt to Assets Ratio'],
+                'Metric': ['Long Term Debt', 'Total Assets', 'Goodwill and Intangible Assets'],
                 'Value': [
                     format_currency(financial_data['Long_Term_Debt']),
                     format_currency(financial_data['Total_Assets']),
-                    format_currency(financial_data['Goodwill_And_Intangibles']),
-                    f"{debt_ratio}%" if debt_ratio is not None else "N/A"
+                    format_currency(financial_data['Goodwill_And_Intangibles'])
                 ]
             })
             st.table(metrics_df)
