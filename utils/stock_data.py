@@ -20,7 +20,7 @@ def get_stock_data(symbol):
         if balance_sheet.empty:
             return None, None, None
         
-        # Get market cap
+        # Get info
         info = stock.info
         
         # Initialize variables
@@ -44,10 +44,16 @@ def get_stock_data(symbol):
             long_term_debt = balance_sheet.iloc[balance_sheet.index == 'Long Term Debt', 0].values[0]
             print(f"\nFound long term debt: {long_term_debt}")
         
+        # Get total assets
+        total_assets = 0
+        if 'Total Assets' in balance_sheet.index:
+            total_assets = balance_sheet.iloc[balance_sheet.index == 'Total Assets', 0].values[0]
+            print(f"\nFound total assets: {total_assets}")
+        
         financial_data = {
             'Long_Term_Debt': long_term_debt,
             'Goodwill_And_Intangibles': goodwill_and_intangibles,
-            'Market_Value': info.get('marketCap', 0)
+            'Total_Assets': total_assets
         }
         
         print("\nFinal financial data:")
@@ -66,7 +72,7 @@ def prepare_download_data(hist_data, financial_data, debt_ratio):
         'Date': hist_data.index,
         'Close': hist_data['Close'],
         'Long_Term_Debt': financial_data['Long_Term_Debt'],
-        'Market_Value': financial_data['Market_Value'],
+        'Total_Assets': financial_data['Total_Assets'],
         'Goodwill_And_Intangibles': financial_data['Goodwill_And_Intangibles'],
         'Debt_Ratio': debt_ratio
     })

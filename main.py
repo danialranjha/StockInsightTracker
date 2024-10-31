@@ -30,7 +30,7 @@ def main():
     
     st.markdown("""
     This application analyzes stock data and calculates custom debt ratios, 
-    excluding goodwill and intangible assets from the company's value.
+    excluding goodwill and intangible assets from the company's total assets.
     The debt ratio is calculated using Long Term Debt instead of Total Debt.
     """)
     
@@ -62,10 +62,10 @@ def main():
             # Financial metrics table
             st.subheader("Financial Metrics")
             metrics_df = pd.DataFrame({
-                'Metric': ['Long Term Debt', 'Market Value', 'Goodwill and Intangible Assets'],
+                'Metric': ['Long Term Debt', 'Total Assets', 'Goodwill and Intangible Assets'],
                 'Value': [
                     format_currency(financial_data['Long_Term_Debt']),
-                    format_currency(financial_data['Market_Value']),
+                    format_currency(financial_data['Total_Assets']),
                     format_currency(financial_data['Goodwill_And_Intangibles'])
                 ]
             })
