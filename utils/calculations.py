@@ -1,16 +1,15 @@
 def calculate_debt_ratio(financial_data):
-    """Calculate custom debt ratio excluding goodwill and intangibles."""
-    total_debt = financial_data['Total_Debt']
-    market_value = financial_data['Market_Value']
-    goodwill = financial_data['Goodwill']
-    intangibles = financial_data['Intangible_Assets']
+    """Calculate custom debt ratio using long term debt and excluding goodwill and intangibles."""
+    long_term_debt = financial_data['Long_Term_Debt']
+    total_assets = financial_data['Total_Assets']
+    goodwill_and_intangibles = financial_data['Goodwill_And_Intangibles']
     
-    adjusted_value = market_value - goodwill - intangibles
+    adjusted_assets = total_assets - goodwill_and_intangibles
     
-    if adjusted_value <= 0:
+    if adjusted_assets <= 0:
         return None
         
-    debt_ratio = (total_debt / adjusted_value) * 100
+    debt_ratio = (long_term_debt / adjusted_assets) * 100
     return round(debt_ratio, 2)
 
 def format_currency(value):
