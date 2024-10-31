@@ -74,17 +74,14 @@ def get_stock_data(symbol):
                     print(f"Found intangibles under field: {field} = {intangibles}")
                     break
         
-        # Get total debt
-        total_debt = 0
-        debt_fields = ['TotalDebt', 'Total Debt']
-        for field in debt_fields:
-            if field in balance_sheet.index:
-                total_debt = balance_sheet.iloc[balance_sheet.index == field, 0].values[0]
-                print(f"\nFound total debt under field: {field} = {total_debt}")
-                break
+        # Get long term debt
+        long_term_debt = 0
+        if 'Long Term Debt' in balance_sheet.index:
+            long_term_debt = balance_sheet.iloc[balance_sheet.index == 'Long Term Debt', 0].values[0]
+            print(f"\nFound long term debt: {long_term_debt}")
         
         financial_data = {
-            'Total_Debt': total_debt,
+            'Long_Term_Debt': long_term_debt,
             'Goodwill': goodwill,
             'Intangible_Assets': intangibles,
             'Market_Value': info.get('marketCap', 0)
@@ -105,7 +102,7 @@ def prepare_download_data(hist_data, financial_data, debt_ratio):
     df = pd.DataFrame({
         'Date': hist_data.index,
         'Close': hist_data['Close'],
-        'Total_Debt': financial_data['Total_Debt'],
+        'Long_Term_Debt': financial_data['Long_Term_Debt'],
         'Market_Value': financial_data['Market_Value'],
         'Goodwill': financial_data['Goodwill'],
         'Intangible_Assets': financial_data['Intangible_Assets'],
