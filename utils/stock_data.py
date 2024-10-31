@@ -34,9 +34,9 @@ def get_stock_data(symbol):
                 print(f"Found field: {field} = {value}")
         
         # Get combined Goodwill and Intangible Assets value
-        if 'GoodwillAndOtherIntangibleAssets' in balance_sheet.index:
-            goodwill_and_intangibles = balance_sheet.iloc[balance_sheet.index == 'GoodwillAndOtherIntangibleAssets', 0].values[0]
-            print(f"\nFound combined GoodwillAndOtherIntangibleAssets: {goodwill_and_intangibles}")
+        if 'Goodwill And Other Intangible Assets' in balance_sheet.index:
+            goodwill_and_intangibles = balance_sheet.iloc[balance_sheet.index == 'Goodwill And Other Intangible Assets', 0].values[0]
+            print(f"\nFound combined Goodwill And Other Intangible Assets: {goodwill_and_intangibles}")
         
         # Get long term debt
         long_term_debt = 0
