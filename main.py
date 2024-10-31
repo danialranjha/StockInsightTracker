@@ -62,12 +62,11 @@ def main():
             # Financial metrics table
             st.subheader("Financial Metrics")
             metrics_df = pd.DataFrame({
-                'Metric': ['Long Term Debt', 'Market Value', 'Goodwill', 'Intangible Assets'],
+                'Metric': ['Long Term Debt', 'Market Value', 'Goodwill and Intangible Assets'],
                 'Value': [
                     format_currency(financial_data['Long_Term_Debt']),
                     format_currency(financial_data['Market_Value']),
-                    format_currency(financial_data['Goodwill']),
-                    format_currency(financial_data['Intangible_Assets'])
+                    format_currency(financial_data['Goodwill_And_Intangibles'])
                 ]
             })
             st.table(metrics_df)
