@@ -61,11 +61,12 @@ def main():
             # Financial metrics table
             st.subheader("Financial Metrics")
             metrics_df = pd.DataFrame({
-                'Metric': ['Long Term Debt', 'Total Assets', 'Goodwill and Intangible Assets'],
+                'Metric': ['Long Term Debt', 'Total Assets', 'Goodwill and Intangible Assets', 'Debt to Assets Ratio'],
                 'Value': [
                     format_currency(financial_data['Long_Term_Debt']),
                     format_currency(financial_data['Total_Assets']),
-                    format_currency(financial_data['Goodwill_And_Intangibles'])
+                    format_currency(financial_data['Goodwill_And_Intangibles']),
+                    f"{debt_ratio}%" if debt_ratio is not None else "N/A"
                 ]
             })
             st.table(metrics_df)
