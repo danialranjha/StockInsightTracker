@@ -37,6 +37,11 @@ st.markdown("""
         border-radius: 0.5rem;
         margin: 0.5rem 0;
     }
+    .non-compliant-reason {
+        color: #ff4b4b;
+        margin-left: 1rem;
+        font-style: italic;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -113,11 +118,17 @@ def main():
                     st.markdown("Target: <33%")
                     st.markdown("</div>", unsafe_allow_html=True)
                 
-                # Business Activity Compliance
+                # Business Activity Compliance with reasons
                 st.markdown("<div class='metric-card'>", unsafe_allow_html=True)
                 status = "compliant" if islamic_ratios['is_business_compliant'] else "non-compliant"
                 st.markdown(f"Business Activities: <span class='{status}'>{'✓ Compliant' if islamic_ratios['is_business_compliant'] else '✗ Non-Compliant'}</span>", 
                           unsafe_allow_html=True)
+                
+                # Display non-compliance reasons if any
+                if not islamic_ratios['is_business_compliant']:
+                    for reason in islamic_ratios['non_compliant_reasons']:
+                        st.markdown(f"<div class='non-compliant-reason'>• {reason}</div>", 
+                                  unsafe_allow_html=True)
                 st.markdown("</div>", unsafe_allow_html=True)
             
             # Financial metrics table
@@ -160,6 +171,8 @@ def main():
                     df['Islamic_Debt_Ratio'] = islamic_ratios['debt_ratio']
                     df['Islamic_Liquidity_Ratio'] = islamic_ratios['liquidity_ratio']
                     df['Islamic_Receivables_Ratio'] = islamic_ratios['receivables_ratio']
+                    if not islamic_ratios['is_business_compliant']:
+                        df['Non_Compliance_Reasons'] = '; '.join(islamic_ratios['non_compliant_reasons'])
                 csv = df.to_csv(index=False)
                 st.download_button(
                     label="Click to Download",

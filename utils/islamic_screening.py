@@ -34,26 +34,35 @@ def calculate_islamic_ratios(financial_data, info):
         industry = info.get('industry', '').lower()
         company_name = info.get('longName', '').lower()
 
-        # Enhanced list of non-compliant business activities
-        non_compliant_keywords = [
-            'alcohol', 'brewery', 'distillery', 'gambling', 'casino',
-            'tobacco', 'pork', 'weapons', 'defense', 'entertainment',
-            'hotel', 'banking', 'insurance', 'interest', 'investment bank',
-            'financial services', 'mortgage', 'credit services',
-            'investment management', 'capital markets'
-        ]
+        # Enhanced list of non-compliant business activities with categories
+        non_compliant_categories = {
+            'alcohol': ['alcohol', 'brewery', 'distillery'],
+            'gambling': ['gambling', 'casino'],
+            'tobacco': ['tobacco'],
+            'prohibited food': ['pork'],
+            'weapons': ['weapons', 'defense'],
+            'adult entertainment': ['entertainment', 'hotel'],
+            'financial services': ['banking', 'insurance', 'interest', 'investment bank',
+                                 'financial services', 'mortgage', 'credit services',
+                                 'investment management', 'capital markets']
+        }
+
+        # Check each category and collect non-compliant reasons
+        non_compliant_reasons = []
+        
+        for category, keywords in non_compliant_categories.items():
+            if any(keyword in sector or keyword in industry for keyword in keywords):
+                non_compliant_reasons.append(f"Company operates in {category} sector")
 
         # Specific checks for financial sector
         is_financial_sector = sector == 'financial services' or 'financial' in sector
         is_bank = any(word in company_name or word in industry for word in ['bank', 'banking'])
         
+        if is_financial_sector or is_bank:
+            non_compliant_reasons.append("Company operates in interest-based financial services")
+
         # Combined business compliance check
-        is_business_compliant = not (
-            any(keyword in sector or keyword in industry 
-                for keyword in non_compliant_keywords) or
-            is_financial_sector or
-            is_bank
-        )
+        is_business_compliant = len(non_compliant_reasons) == 0
 
         return {
             'debt_ratio': round(debt_ratio, 2),
@@ -65,6 +74,7 @@ def calculate_islamic_ratios(financial_data, info):
             'is_business_compliant': is_business_compliant,
             'sector': sector,
             'industry': industry,
+            'non_compliant_reasons': non_compliant_reasons,
             'is_fully_compliant': (
                 is_debt_compliant and 
                 is_liquidity_compliant and 
