@@ -1,7 +1,10 @@
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
+from utils.cache import cache_response, rate_limit
 
+@cache_response(ttl_minutes=15)
+@rate_limit()
 def get_stock_data(symbol):
     """Fetch stock data and financial information."""
     try:
