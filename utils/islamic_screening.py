@@ -33,25 +33,39 @@ def calculate_islamic_ratios(financial_data, info):
         sector = info.get('sector', '').lower()
         industry = info.get('industry', '').lower()
         company_name = info.get('longName', '').lower()
+        business_summary = info.get('longBusinessSummary', '').lower()
 
         # Enhanced list of non-compliant business activities with categories
         non_compliant_categories = {
-            'alcohol': ['alcohol', 'brewery', 'distillery'],
-            'gambling': ['gambling', 'casino'],
-            'tobacco': ['tobacco'],
-            'prohibited food': ['pork'],
-            'weapons': ['weapons', 'defense'],
-            'adult entertainment': ['entertainment', 'hotel'],
-            'financial services': ['banking', 'insurance', 'interest', 'investment bank',
-                                 'financial services', 'mortgage', 'credit services',
-                                 'investment management', 'capital markets']
+            'alcohol': [
+                'alcohol', 'brewery', 'breweries', 'distillery', 'distilleries', 
+                'wine', 'spirits', 'beer', 'liquor', 'beverages-alcoholic',
+                'craft brew', 'craft beer', 'wines & spirits', 'winery',
+                'brewing', 'alcoholic beverages', 'malt beverages',
+                'beverage-brewers', 'beverage distribution-alcohol'
+            ],
+            'gambling': ['gambling', 'casino', 'betting', 'wagering', 'lottery'],
+            'tobacco': ['tobacco', 'cigarettes', 'cigars', 'smoking products', 'vaping'],
+            'prohibited food': ['pork', 'swine', 'ham', 'bacon'],
+            'weapons': ['weapons', 'defense', 'ammunition', 'firearms', 'missiles'],
+            'adult entertainment': [
+                'adult entertainment', 'adult content', 'gambling', 'casino',
+                'nightclub', 'cabaret'
+            ],
+            'financial services': [
+                'banking', 'insurance', 'interest', 'investment bank',
+                'financial services', 'mortgage', 'credit services',
+                'investment management', 'capital markets', 'lending',
+                'credit card', 'investment banking'
+            ]
         }
 
         # Check each category and collect non-compliant reasons
         non_compliant_reasons = []
         
         for category, keywords in non_compliant_categories.items():
-            if any(keyword in sector or keyword in industry for keyword in keywords):
+            # Check in sector, industry, company name and business summary
+            if any(keyword in text for keyword in keywords for text in [sector, industry, company_name, business_summary]):
                 non_compliant_reasons.append(f"Company operates in {category} sector")
 
         # Specific checks for financial sector
