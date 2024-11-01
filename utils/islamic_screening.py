@@ -1,3 +1,5 @@
+from utils.calculations import calculate_debt_ratio
+
 def calculate_islamic_ratios(financial_data, info):
     """Calculate Islamic compliance ratios."""
     try:
@@ -5,8 +7,12 @@ def calculate_islamic_ratios(financial_data, info):
         if market_cap == 0:
             return None
 
+        # Use the same debt ratio calculation as in calculations.py
+        debt_ratio = calculate_debt_ratio(financial_data)
+        if debt_ratio is None:
+            return None
+
         # Get financial metrics
-        long_term_debt = financial_data['Long_Term_Debt']
         cash_and_investments = sum([
             info.get('totalCash', 0),
             info.get('shortTermInvestments', 0),
@@ -14,8 +20,7 @@ def calculate_islamic_ratios(financial_data, info):
         ])
         accounts_receivable = info.get('netReceivables', 0)
 
-        # Calculate ratios
-        debt_ratio = (long_term_debt / market_cap) * 100
+        # Calculate other ratios using market cap
         liquidity_ratio = (cash_and_investments / market_cap) * 100
         receivables_ratio = (accounts_receivable / market_cap) * 100
 
@@ -27,18 +32,27 @@ def calculate_islamic_ratios(financial_data, info):
         # Get business activity info
         sector = info.get('sector', '').lower()
         industry = info.get('industry', '').lower()
+        company_name = info.get('longName', '').lower()
 
-        # List of non-compliant business activities
+        # Enhanced list of non-compliant business activities
         non_compliant_keywords = [
             'alcohol', 'brewery', 'distillery', 'gambling', 'casino',
             'tobacco', 'pork', 'weapons', 'defense', 'entertainment',
-            'hotel', 'banking', 'insurance', 'interest'
+            'hotel', 'banking', 'insurance', 'interest', 'investment bank',
+            'financial services', 'mortgage', 'credit services',
+            'investment management', 'capital markets'
         ]
 
-        # Check business compliance
-        is_business_compliant = not any(
-            keyword in sector or keyword in industry 
-            for keyword in non_compliant_keywords
+        # Specific checks for financial sector
+        is_financial_sector = sector == 'financial services' or 'financial' in sector
+        is_bank = any(word in company_name or word in industry for word in ['bank', 'banking'])
+        
+        # Combined business compliance check
+        is_business_compliant = not (
+            any(keyword in sector or keyword in industry 
+                for keyword in non_compliant_keywords) or
+            is_financial_sector or
+            is_bank
         )
 
         return {
