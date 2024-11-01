@@ -53,10 +53,11 @@ def calculate_islamic_ratios(financial_data, info):
                 'nightclub', 'cabaret'
             ],
             'financial services': [
-                'banking', 'insurance', 'interest', 'investment bank',
-                'financial services', 'mortgage', 'credit services',
-                'investment management', 'capital markets', 'lending',
-                'credit card', 'investment banking'
+                'commercial bank', 'investment bank', 'mortgage', 'credit services',
+                'credit card', 'lending services', 'consumer lending',
+                'asset management', 'capital markets', 'insurance',
+                'investment brokerage', 'wealth management', 'retail banking',
+                'corporate banking', 'financial exchange'
             ]
         }
 
@@ -65,14 +66,25 @@ def calculate_islamic_ratios(financial_data, info):
         
         for category, keywords in non_compliant_categories.items():
             # Check in sector, industry, company name and business summary
-            if any(keyword in text for keyword in keywords for text in [sector, industry, company_name, business_summary]):
+            if any(keyword in text for keyword in keywords for text in [sector, industry, company_name]):
                 non_compliant_reasons.append(f"Company operates in {category} sector")
 
-        # Specific checks for financial sector
-        is_financial_sector = sector == 'financial services' or 'financial' in sector
-        is_bank = any(word in company_name or word in industry for word in ['bank', 'banking'])
+        # Specific checks for financial institutions
+        financial_indicators = [
+            'bank', 'banking', 'credit union', 'savings and loan',
+            'mortgage reit', 'financial exchange', 'insurance carrier',
+            'investment brokerage', 'asset management', 'wealth management'
+        ]
+
+        # More precise financial sector identification
+        is_financial_institution = (
+            any(indicator in industry.lower() for indicator in financial_indicators) or
+            any(indicator in company_name.lower() for indicator in financial_indicators) or
+            (sector == 'financial services' and 
+             any(indicator in industry.lower() for indicator in financial_indicators))
+        )
         
-        if is_financial_sector or is_bank:
+        if is_financial_institution:
             non_compliant_reasons.append("Company operates in interest-based financial services")
 
         # Combined business compliance check
