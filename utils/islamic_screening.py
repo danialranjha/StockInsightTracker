@@ -31,7 +31,7 @@ def calculate_islamic_ratios(financial_data, info):
 
         # Get business activity info
         sector = info.get('sector', '').lower()
-        industry = info.get('industry', '').lower()
+        industry = info.get('industry', '')
         company_name = info.get('longName', '').lower()
         business_summary = info.get('longBusinessSummary', '').lower()
 
@@ -42,7 +42,11 @@ def calculate_islamic_ratios(financial_data, info):
                 'wine', 'spirits', 'beer', 'liquor', 'beverages-alcoholic',
                 'craft brew', 'craft beer', 'wines & spirits', 'winery',
                 'brewing', 'alcoholic beverages', 'malt beverages',
-                'beverage-brewers', 'beverage distribution-alcohol'
+                'beverage-brewers', 'beverage distribution-alcohol',
+                'beverages - brewers', 'beverages - wineries & distilleries',
+                'brewing company', 'brewers', 'brewer', 'anheuser', 'busch',
+                'heineken', 'carlsberg', 'molson', 'coors', 'budweiser',
+                'corona', 'stella artois', 'draft beer', 'pale ale', 'lager'
             ],
             'gambling': ['gambling', 'casino', 'betting', 'wagering', 'lottery'],
             'tobacco': ['tobacco', 'cigarettes', 'cigars', 'smoking products', 'vaping'],
@@ -61,13 +65,48 @@ def calculate_islamic_ratios(financial_data, info):
             ]
         }
 
+        # List of non-compliant industries (case-insensitive)
+        alcohol_industries = [
+            'beverages - brewers',
+            'beverages - wineries & distilleries',
+            'alcoholic beverages',
+            'brewery companies',
+            'beverages-brewers',
+            'brewers'
+        ]
+
         # Check each category and collect non-compliant reasons
         non_compliant_reasons = []
         
+        # Check industry first (case-insensitive)
+        if any(industry.lower() == alcohol_ind.lower() for alcohol_ind in alcohol_industries):
+            non_compliant_reasons.append(f"Company is in the {industry} industry")
+        
+        # Enhanced checking for all categories including alcohol
         for category, keywords in non_compliant_categories.items():
-            # Check in sector, industry, company name and business summary
-            if any(keyword in text for keyword in keywords for text in [sector, industry, company_name]):
-                non_compliant_reasons.append(f"Company operates in {category} sector")
+            # Check in company name
+            if any(keyword in company_name for keyword in keywords):
+                reason = f"Company name indicates involvement in {category} business"
+                if reason not in non_compliant_reasons:
+                    non_compliant_reasons.append(reason)
+            
+            # Check in industry
+            if any(keyword in industry.lower() for keyword in keywords):
+                reason = f"Company operates in {category} industry"
+                if reason not in non_compliant_reasons:
+                    non_compliant_reasons.append(reason)
+            
+            # Check in business summary
+            if any(keyword in business_summary for keyword in keywords):
+                reason = f"Company's business description indicates involvement in {category}"
+                if reason not in non_compliant_reasons:
+                    non_compliant_reasons.append(reason)
+            
+            # Check in sector
+            if any(keyword in sector for keyword in keywords):
+                reason = f"Company operates in {category} sector"
+                if reason not in non_compliant_reasons:
+                    non_compliant_reasons.append(reason)
 
         # Specific checks for financial institutions
         financial_indicators = [
@@ -79,7 +118,7 @@ def calculate_islamic_ratios(financial_data, info):
         # More precise financial sector identification
         is_financial_institution = (
             any(indicator in industry.lower() for indicator in financial_indicators) or
-            any(indicator in company_name.lower() for indicator in financial_indicators) or
+            any(indicator in company_name for indicator in financial_indicators) or
             (sector == 'financial services' and 
              any(indicator in industry.lower() for indicator in financial_indicators))
         )
