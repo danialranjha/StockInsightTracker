@@ -181,5 +181,11 @@ def main():
                     mime="text/csv"
                 )
 
+# Add a health check endpoint
+@st.cache_resource
+def health_check():
+    return "OK"
+
 if __name__ == "__main__":
     main()
+    st.write(health_check())

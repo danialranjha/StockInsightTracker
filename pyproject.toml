@@ -9,3 +9,6 @@ dependencies = [
     "streamlit>=1.39.0",
     "yfinance>=0.2.48",
 ]
+
+[tool.poetry.dependencies]
+streamlit = "^1.39.0"
