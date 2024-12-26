@@ -1,2 +1,19 @@
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
 venv/
+ENV/
+env.bak/
+venv.bak/
+.idea/
+.vscode/
+*.swp
+.DS_Store
+*.log
+*.sqlite3
+*.db
+*.env
 
