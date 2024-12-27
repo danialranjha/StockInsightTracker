@@ -16,4 +16,4 @@ venv.bak/
 *.sqlite3
 *.db
 *.env
-
+tests/mock_data/
