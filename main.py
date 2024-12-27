@@ -5,6 +5,10 @@ import pandas as pd
 from utils.stock_data import get_stock_data, prepare_download_data
 from utils.calculations import calculate_debt_ratio, format_currency
 from utils.islamic_screening import calculate_islamic_ratios
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 st.set_page_config(
     page_title="Stock Debt Analysis",
@@ -122,13 +126,16 @@ def main():
                 st.markdown("<div class='metric-card'>", unsafe_allow_html=True)
                 status = "compliant" if islamic_ratios['is_business_compliant'] else "non-compliant"
                 st.markdown(f"Business Activities: <span class='{status}'>{'✓ Compliant' if islamic_ratios['is_business_compliant'] else '✗ Non-Compliant'}</span>", 
-                          unsafe_allow_html=True)
-                
-                # Display non-compliance reasons if any
+                            unsafe_allow_html=True)
+
+                # Log the compliance status and reasons if non-compliant
                 if not islamic_ratios['is_business_compliant']:
+                    business_description = info.get('longBusinessSummary', 'No description available')
+                    logging.debug(f"Business Activities for {symbol} are non-compliant.")
+                    logging.debug(f"Business Description: {business_description}")
                     for reason in islamic_ratios['non_compliant_reasons']:
-                        st.markdown(f"<div class='non-compliant-reason'>• {reason}</div>", 
-                                  unsafe_allow_html=True)
+                        logging.debug(f"Non-compliance reason: {reason}")
+                        st.markdown(f"<div class='non-compliant-reason'>• {reason}</div>", unsafe_allow_html=True)
                 st.markdown("</div>", unsafe_allow_html=True)
             
             # Financial metrics table

@@ -1,9 +1,8 @@
 import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
-from utils.cache import cache_response, rate_limit
+from utils.cache import rate_limit
 
-@cache_response(ttl_minutes=15)
 @rate_limit()
 def get_stock_data(symbol):
     """Fetch stock data and financial information."""
@@ -33,24 +32,24 @@ def get_stock_data(symbol):
         print("\nSearching for intangible-related fields...")
         for field in balance_sheet.index:
             if any(keyword in field.lower() for keyword in ['goodwill', 'intangible']):
-                value = balance_sheet.iloc[balance_sheet.index == field, 0].values[0]
+                value = balance_sheet.loc[field][0]
                 print(f"Found field: {field} = {value}")
         
         # Get combined Goodwill and Intangible Assets value
         if 'Goodwill And Other Intangible Assets' in balance_sheet.index:
-            goodwill_and_intangibles = balance_sheet.iloc[balance_sheet.index == 'Goodwill And Other Intangible Assets', 0].values[0]
+            goodwill_and_intangibles = balance_sheet.loc['Goodwill And Other Intangible Assets'][0]
             print(f"\nFound combined Goodwill And Other Intangible Assets: {goodwill_and_intangibles}")
         
         # Get long term debt
         long_term_debt = 0
         if 'Long Term Debt' in balance_sheet.index:
-            long_term_debt = balance_sheet.iloc[balance_sheet.index == 'Long Term Debt', 0].values[0]
+            long_term_debt = balance_sheet.loc['Long Term Debt'][0]
             print(f"\nFound long term debt: {long_term_debt}")
         
         # Get total assets
         total_assets = 0
         if 'Total Assets' in balance_sheet.index:
-            total_assets = balance_sheet.iloc[balance_sheet.index == 'Total Assets', 0].values[0]
+            total_assets = balance_sheet.loc['Total Assets'][0]
             print(f"\nFound total assets: {total_assets}")
         
         financial_data = {
