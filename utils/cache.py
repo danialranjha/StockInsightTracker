@@ -11,7 +11,7 @@ _cache_lock = threading.Lock()
 # Rate limiting variables
 _last_request_time = 0
 _request_lock = threading.Lock()
-MIN_REQUEST_INTERVAL = 2  # Minimum time between requests in seconds
+MIN_REQUEST_INTERVAL = 5  # Increased to 5 seconds to reduce risk of HTTP 429 errors (Too Many Requests)
 
 def rate_limit():
     """Rate limiting decorator to prevent too many requests."""

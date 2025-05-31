@@ -2,18 +2,52 @@ import yfinance as yf
 import pandas as pd
 from datetime import datetime, timedelta
 from utils.cache import rate_limit
+import requests
+import time
+
+# --- Robust error handling and retry logic for yfinance requests ---
+def retry_with_backoff(func, *args, **kwargs):
+    """
+    Retry a function up to 3 times with exponential backoff if HTTP 429 is encountered.
+    """
+    max_retries = 3
+    delay = 2
+    for attempt in range(max_retries):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            # Check for HTTP 429 Too Many Requests
+            if hasattr(e, "response") and getattr(e.response, "status_code", None) == 429:
+                if attempt < max_retries - 1:
+                    time.sleep(delay)
+                    delay *= 2
+                else:
+                    raise
+            elif "429" in str(e):
+                if attempt < max_retries - 1:
+                    time.sleep(delay)
+                    delay *= 2
+                else:
+                    raise
+            else:
+                raise
+
+# --- Set custom User-Agent for all yfinance requests ---
+# This ensures all yfinance HTTP requests use a custom User-Agent header
+yf.shared._requests_kwargs = {"headers": {"User-Agent": "StockInsightTracker/1.0 (+https://yourdomain.com)"}}
 
 @rate_limit()
 def get_stock_data(symbol):
-    """Fetch stock data and financial information."""
+    """Fetch stock data and financial information with retry and rate limiting."""
     try:
-        stock = yf.Ticker(symbol)
+        # Use retry logic for all yfinance data fetches to handle HTTP 429 errors
+        stock = retry_with_backoff(yf.Ticker, symbol)
         
-        # Get historical data
-        hist = stock.history(period="1y")
+        # Get historical data with retry
+        hist = retry_with_backoff(stock.history, period="1y")
         
-        # Get balance sheet
-        balance_sheet = stock.balance_sheet
+        # Get balance sheet with retry
+        balance_sheet = retry_with_backoff(lambda: stock.balance_sheet)
         
         # Debug logging
         print("\nAvailable Balance Sheet Fields:")
@@ -22,8 +56,8 @@ def get_stock_data(symbol):
         if balance_sheet.empty:
             return None, None, None
         
-        # Get info
-        info = stock.info
+        # Get info with retry
+        info = retry_with_backoff(lambda: stock.info)
         
         # Initialize variables
         goodwill_and_intangibles = 0

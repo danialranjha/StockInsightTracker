@@ -6,6 +6,14 @@ from utils.stock_data import get_stock_data, prepare_download_data
 from utils.calculations import calculate_debt_ratio, format_currency
 from utils.islamic_screening import calculate_islamic_ratios
 import logging
+import requests_cache
+import requests
+
+# Enable HTTP response caching for all requests (including yfinance) for 1 hour to reduce duplicate API calls and avoid 429 errors
+requests_cache.install_cache('yfinance_cache', expire_after=3600)
+
+# Set a custom User-Agent for all requests (including yfinance)
+requests.utils.default_headers()['User-Agent'] = 'StockInsightTracker/1.0 (+https://yourdomain.com)'
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
