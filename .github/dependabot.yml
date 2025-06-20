@@ -6,6 +6,7 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "09:00"
+      timezone: "UTC"
     open-pull-requests-limit: 5
     reviewers:
       - "danialranjha"
@@ -24,8 +25,4 @@ updates:
         update-types:
           - "minor"
           - "patch"
-      security-updates:
-        patterns:
-          - "*"
-        update-types:
           - "security"
