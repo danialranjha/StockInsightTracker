@@ -72,10 +72,11 @@ def check_business_practices(info):
         ],
         'financial services': [
             'commercial bank', 'investment bank', 'mortgage', 'credit services',
-            'credit card', 'lending services', 'consumer lending',
-            'asset management', 'capital markets', 'insurance',
-            'investment brokerage', 'wealth management', 'retail banking',
-            'corporate banking', 'financial exchange'
+            'credit card company', 'credit card issuer', 'credit card provider',
+            'lending services', 'consumer lending', 'asset management', 
+            'capital markets', 'insurance', 'investment brokerage', 
+            'wealth management', 'retail banking', 'corporate banking', 
+            'financial exchange'
         ]
     }
 
