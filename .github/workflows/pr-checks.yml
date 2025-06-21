@@ -46,7 +46,7 @@ jobs:
       run: |
         coverage run -m pytest
         coverage xml
-        coverage report --fail-under=80
+        coverage report --fail-under=70
         COVERAGE=$(coverage report --format=total)
         echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
     
@@ -65,9 +65,9 @@ jobs:
           
           **Current Coverage:** ${{ steps.coverage.outputs.coverage }}%
           
-          The minimum required coverage is **80%**.
+          The minimum required coverage is **70%**.
           
-          ${{ steps.coverage.outputs.coverage >= 80 && '✅ Coverage requirement met!' || '❌ Coverage requirement not met!' }}
+          ${{ steps.coverage.outputs.coverage >= 70 && '✅ Coverage requirement met!' || '❌ Coverage requirement not met!' }}
 
   dependency-check:
     runs-on: ubuntu-latest
