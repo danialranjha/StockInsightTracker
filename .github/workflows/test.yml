@@ -1,0 +1,162 @@
+name: Test Suite
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  statuses: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install uv
+        uv pip install --system -e ".[test]"
+
+    - name: Run linting
+      run: |
+        pip install flake8 black isort
+        # Stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Check code formatting
+        black --check --diff .
+        # Check import sorting
+        isort --check-only --diff .
+
+    - name: Run tests with coverage
+      run: |
+        pytest --cov=. --cov-report=xml --cov-report=html --cov-report=term-missing --cov-fail-under=70 -v
+
+    - name: Upload coverage reports to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
+
+    - name: Upload coverage to GitHub
+      if: github.event_name == 'pull_request'
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report-${{ matrix.python-version }}
+        path: htmlcov/
+
+    - name: Extract coverage percentage
+      if: github.event_name == 'pull_request' && matrix.python-version == '3.11'
+      id: coverage
+      run: |
+        COVERAGE=$(python -c "
+        import xml.etree.ElementTree as ET
+        tree = ET.parse('coverage.xml')
+        root = tree.getroot()
+        coverage = root.attrib['line-rate']
+        print(f'{float(coverage)*100:.0f}')
+        ")
+        echo "percentage=$COVERAGE" >> $GITHUB_OUTPUT
+        echo "Coverage: $COVERAGE%"
+
+    - name: Comment PR with coverage
+      if: github.event_name == 'pull_request' && matrix.python-version == '3.11'
+      uses: marocchino/sticky-pull-request-comment@v2
+      with:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        header: coverage
+        message: |
+          ## 📊 Coverage Report
+          
+          **Current Coverage:** ${{ steps.coverage.outputs.percentage }}%
+          **Minimum Required:** 70%
+          
+          ${{ steps.coverage.outputs.percentage >= 70 && '✅ Coverage requirement met!' || '❌ Coverage requirement not met!' }}
+          
+          <details>
+          <summary>View detailed coverage report</summary>
+          
+          The coverage report shows the percentage of code covered by tests.
+          Files with less than 70% coverage should have additional tests added.
+          </details>
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: 'pip'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit safety
+    
+    - name: Run security scan with bandit
+      run: |
+        bandit -r . -x "*/tests/*,test_*.py" -f json -o bandit-report.json
+        bandit -r . -x "*/tests/*,test_*.py"
+      continue-on-error: false
+    
+    - name: Run safety check
+      run: |
+        safety check --output json --save-json safety-report.json || echo "Security issues found"
+        safety check || echo "Please review security report"
+      continue-on-error: false
+
+  lint-and-format-check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+        cache: 'pip'
+    
+    - name: Install linting tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 black isort mypy
+    
+    - name: Run flake8
+      run: flake8 . --max-line-length=88 --extend-ignore=E203,W503
+    
+    - name: Check code formatting with black
+      run: black --check .
+    
+    - name: Check import sorting with isort
+      run: isort --check-only .
+    
+    - name: Run type checking with mypy
+      run: mypy . --ignore-missing-imports --no-strict-optional
+      continue-on-error: true  # Type checking failures won't fail the workflow
