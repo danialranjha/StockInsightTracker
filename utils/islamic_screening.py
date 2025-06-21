@@ -72,6 +72,9 @@ def check_business_practices(info):
         ],
         'financial services': [
             'commercial bank', 'investment bank', 'mortgage', 'credit services',
+            # Note: Using specific credit card terms instead of generic 'credit card' to avoid
+            # false positives with tech companies that offer payment products (e.g., Apple Card)
+            # while still catching actual credit card issuers and financial institutions
             'credit card company', 'credit card issuer', 'credit card provider',
             'credit card business', 'credit card services', 'credit card processing',
             'lending services', 'consumer lending', 'asset management', 
