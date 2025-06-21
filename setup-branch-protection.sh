@@ -45,7 +45,6 @@ gh api \
   --field required_status_checks[contexts][]="test (3.11)" \
   --field required_status_checks[contexts][]="security-scan" \
   --field required_status_checks[contexts][]="lint-and-format-check" \
-  --field required_status_checks[contexts][]="test-coverage-check" \
   --field enforce_admins=false \
   --field required_pull_request_reviews[required_approving_review_count]=1 \
   --field required_pull_request_reviews[dismiss_stale_reviews]=true \

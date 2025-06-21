@@ -75,9 +75,9 @@ jobs:
       with:
         coverageFile: coverage.xml
         token: ${{ secrets.GITHUB_TOKEN }}
-        thresholdAll: 70
-        thresholdNew: 75
-        thresholdModified: 70
+        thresholdAll: 0.70
+        thresholdNew: 0.75
+        thresholdModified: 0.70
 
   security-scan:
     runs-on: ubuntu-latest

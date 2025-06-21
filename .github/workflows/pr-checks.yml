@@ -31,48 +31,6 @@ jobs:
         ignoreLabels: |
           ignore-semantic-pull-request
 
-  test-coverage-check:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
-        cache: 'pip'
-    
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install --system -e ".[test]"
-    
-    - name: Run tests and check coverage
-      id: coverage
-      run: |
-        pytest --cov=. --cov-report=xml --cov-report=term-missing --cov-fail-under=70 | tee pytest_output.txt
-        COVERAGE=$(grep "TOTAL" pytest_output.txt | awk '{print $4}' | sed 's/%//')
-        echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
-    
-    - name: Coverage Badge
-      uses: tj-actions/coverage-badge-py@v2
-      with:
-        output: coverage.svg
-    
-    - name: Comment PR with coverage results
-      uses: marocchino/sticky-pull-request-comment@v2
-      with:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        header: coverage
-        message: |
-          ## 📊 Coverage Report
-          
-          **Current Coverage:** ${{ steps.coverage.outputs.coverage }}%
-          
-          The minimum required coverage is **70%**.
-          
-          ${{ steps.coverage.outputs.coverage >= 70 && '✅ Coverage requirement met!' || '❌ Coverage requirement not met!' }}
 
   dependency-check:
     runs-on: ubuntu-latest
