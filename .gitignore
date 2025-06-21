@@ -17,3 +17,20 @@ venv.bak/
 *.db
 *.env
 tests/mock_data/
+
+# Test coverage
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+coverage.svg
+.pytest_cache/
+.tox/
+.nox/
+
+# Security reports  
+bandit-report.json
+safety-report.json
+
+# Streamlit
+.streamlit/
