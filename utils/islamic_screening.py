@@ -103,7 +103,7 @@ def check_business_practices(info):
                 non_compliant_reasons.append(reason)
                 logging.debug(reason)
         
-        if any(re.search(r'\b' + re.escape(keyword) + r'\b', industry.lower(), re.IGNORECASE) for keyword in keywords):
+        if any(re.search(r'\b' + re.escape(keyword) + r'\b', industry, re.IGNORECASE) for keyword in keywords):
             reason = f"Company operates in {category} industry"
             if reason not in non_compliant_reasons:
                 non_compliant_reasons.append(reason)
