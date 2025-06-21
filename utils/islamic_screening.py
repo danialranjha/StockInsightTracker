@@ -71,16 +71,24 @@ def check_business_practices(info):
             'nightclub', 'cabaret'
         ],
         'financial services': [
-            'commercial bank', 'investment bank', 'mortgage', 'credit services',
-            # Note: Using specific credit card terms instead of generic 'credit card' to avoid
-            # false positives with tech companies that offer payment products (e.g., Apple Card)
-            # while still catching actual credit card issuers and financial institutions
+            # Banking and traditional financial institutions
+            'commercial bank', 'investment bank', 'retail banking', 'corporate banking',
+            'financial exchange',
+            
+            # Credit and lending services
+            'credit services', 'lending services', 'consumer lending', 'mortgage',
+            
+            # Credit card specific terms (avoiding generic 'credit card' to prevent false positives
+            # with tech companies that offer payment products like Apple Card)
             'credit card company', 'credit card issuer', 'credit card provider',
             'credit card business', 'credit card services', 'credit card processing',
-            'lending services', 'consumer lending', 'asset management', 
-            'capital markets', 'insurance', 'investment brokerage', 
-            'wealth management', 'retail banking', 'corporate banking', 
-            'financial exchange'
+            
+            # Investment and wealth management
+            'asset management', 'investment brokerage', 'wealth management',
+            'capital markets',
+            
+            # Insurance
+            'insurance'
         ]
     }
 
