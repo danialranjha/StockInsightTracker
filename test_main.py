@@ -109,3 +109,37 @@ def test_bac_compliance():
             "Company operates in interest-based financial services"
         ]
     )
+
+def test_hims_compliance():
+    """Test HIMS compliance - should be compliant (no prohibited food false positive)"""
+    from unittest.mock import patch
+    
+    # Mock HIMS data with business description containing "shampoos"
+    mock_info = {
+        'longName': 'Hims & Hers Health, Inc.',
+        'sector': 'Consumer Defensive',
+        'industry': 'Household & Personal Products', 
+        'longBusinessSummary': 'operates a telehealth platform offering health and wellness products including shampoos, conditioners, scalp scrubs, and topical treatments',
+        'marketCap': 1000000000,
+        'totalCash': 100000000,
+        'shortTermInvestments': 0,
+        'longTermInvestments': 0,
+        'netReceivables': 50000000
+    }
+    
+    mock_financial_data = {
+        'Long_Term_Debt': 50000000,
+        'Total_Assets': 500000000,
+        'Goodwill_And_Intangibles': 50000000
+    }
+    
+    with patch("test_main.get_stock_data", return_value=({}, mock_financial_data, mock_info)):
+        from utils.islamic_screening import calculate_islamic_ratios
+        islamic_ratios = calculate_islamic_ratios(mock_financial_data, mock_info)
+        
+        # HIMS should be compliant - no prohibited food false positive
+        assert islamic_ratios is not None, "Islamic ratios calculation failed for HIMS"
+        assert islamic_ratios["is_business_compliant"] == True, \
+            f"Expected HIMS to be business compliant, but got: {islamic_ratios['is_business_compliant']}"
+        assert islamic_ratios["non_compliant_reasons"] == [], \
+            f"Expected no non-compliant reasons for HIMS, but got: {islamic_ratios['non_compliant_reasons']}"
