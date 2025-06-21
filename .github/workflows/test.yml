@@ -17,9 +17,10 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
 
     - name: Install system dependencies
       run: |
@@ -47,16 +48,17 @@ jobs:
         pytest --cov=. --cov-report=xml --cov-report=html --cov-report=term-missing --cov-fail-under=70 -v
 
     - name: Upload coverage reports to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
         flags: unittests
         name: codecov-umbrella
         fail_ci_if_error: false
+        token: ${{ secrets.CODECOV_TOKEN }}
 
     - name: Upload coverage to GitHub
       if: github.event_name == 'pull_request'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-report-${{ matrix.python-version }}
         path: htmlcov/
@@ -77,9 +79,10 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.11"
+        cache: 'pip'
     
     - name: Install dependencies
       run: |
@@ -88,13 +91,15 @@ jobs:
     
     - name: Run security scan with bandit
       run: |
-        bandit -r . -x tests/,test_*.py -f json -o bandit-report.json || true
+        bandit -r . -x tests/,test_*.py -f json -o bandit-report.json
         bandit -r . -x tests/,test_*.py
+      continue-on-error: false
     
     - name: Run safety check
       run: |
-        safety check --json --output safety-report.json || true
+        safety check --json --output safety-report.json
         safety check
+      continue-on-error: false
 
   lint-and-format-check:
     runs-on: ubuntu-latest
@@ -102,9 +107,10 @@ jobs:
     - uses: actions/checkout@v4
     
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: "3.11"
+        cache: 'pip'
     
     - name: Install linting tools
       run: |

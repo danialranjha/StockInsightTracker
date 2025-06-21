@@ -61,5 +61,3 @@ exclude_lines = [
     "@(abc\\.)?abstractmethod",
 ]
 
-[tool.poetry.dependencies]
-streamlit = "^1.39.0"
