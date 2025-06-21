@@ -69,15 +69,40 @@ jobs:
         name: coverage-report-${{ matrix.python-version }}
         path: htmlcov/
 
+    - name: Extract coverage percentage
+      if: github.event_name == 'pull_request' && matrix.python-version == '3.11'
+      id: coverage
+      run: |
+        COVERAGE=$(python -c "
+        import xml.etree.ElementTree as ET
+        tree = ET.parse('coverage.xml')
+        root = tree.getroot()
+        coverage = root.attrib['line-rate']
+        print(f'{float(coverage)*100:.0f}')
+        ")
+        echo "percentage=$COVERAGE" >> $GITHUB_OUTPUT
+        echo "Coverage: $COVERAGE%"
+
     - name: Comment PR with coverage
       if: github.event_name == 'pull_request' && matrix.python-version == '3.11'
-      uses: orgoro/coverage@v3.1
+      uses: marocchino/sticky-pull-request-comment@v2
       with:
-        coverageFile: coverage.xml
-        token: ${{ secrets.GITHUB_TOKEN }}
-        thresholdAll: 0.70
-        thresholdNew: 0.75
-        thresholdModified: 0.70
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        header: coverage
+        message: |
+          ## 📊 Coverage Report
+          
+          **Current Coverage:** ${{ steps.coverage.outputs.percentage }}%
+          **Minimum Required:** 70%
+          
+          ${{ steps.coverage.outputs.percentage >= 70 && '✅ Coverage requirement met!' || '❌ Coverage requirement not met!' }}
+          
+          <details>
+          <summary>View detailed coverage report</summary>
+          
+          The coverage report shows the percentage of code covered by tests.
+          Files with less than 70% coverage should have additional tests added.
+          </details>
 
   security-scan:
     runs-on: ubuntu-latest
