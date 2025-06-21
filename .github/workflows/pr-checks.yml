@@ -45,9 +45,7 @@ jobs:
     - name: Run tests and check coverage
       id: coverage
       run: |
-        coverage run -m pytest
-        coverage xml
-        coverage report --fail-under=70
+        pytest --cov=. --cov-report=xml --cov-report=term-missing --cov-fail-under=70
         COVERAGE=$(coverage report --format=total)
         echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
     
