@@ -4,7 +4,8 @@ import pandas as pd
 import pytest
 import requests
 
-from utils.stock_data import get_stock_data, prepare_download_data, retry_with_backoff
+from utils.stock_data import (get_stock_data, prepare_download_data,
+                              retry_with_backoff)
 
 
 class TestStockData:

@@ -102,9 +102,7 @@ def main():
                 st.write(f"Industry: {info.get('industry', 'N/A')}")
             with col2:
                 if debt_ratio:
-                    ratio_color = (
-                        "high-debt" if debt_ratio > 30 else "normal-debt"
-                    )
+                    ratio_color = "high-debt" if debt_ratio > 30 else "normal-debt"
                     st.markdown(
                         f"<h3>Debt Ratio: <span class='{ratio_color}'>"
                         f"{debt_ratio}%</span></h3>",

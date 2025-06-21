@@ -1,8 +1,6 @@
-from utils.islamic_screening import (
-    calculate_islamic_ratios,
-    calculate_ratios,
-    check_business_practices,
-)
+from utils.islamic_screening import (calculate_islamic_ratios,
+                                     calculate_ratios,
+                                     check_business_practices)
 
 
 class TestIslamicScreening:

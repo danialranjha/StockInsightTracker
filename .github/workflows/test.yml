@@ -91,8 +91,8 @@ jobs:
     
     - name: Run security scan with bandit
       run: |
-        bandit -r . -x tests/,test_*.py -f json -o bandit-report.json
-        bandit -r . -x tests/,test_*.py
+        bandit -r . -x "*/tests/*,test_*.py" -f json -o bandit-report.json
+        bandit -r . -x "*/tests/*,test_*.py"
       continue-on-error: false
     
     - name: Run safety check
