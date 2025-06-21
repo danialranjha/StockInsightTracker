@@ -73,23 +73,23 @@ def test_check_business_practices():
     assert 'non_compliant_reasons' in business_practices, "non_compliant_reasons not in result"
 
 def test_aapl_business_practices_compliance(caplog):
-    """Test AAPL business practices compliance and capture debug logs"""
+    """Test AAPL business practices compliance - should be compliant after credit card keyword fix
+    
+    AAPL was previously marked non-compliant due to 'Apple Card, a co-branded credit card'
+    in its business description. After fixing the keywords to be more specific
+    ('credit card company/issuer/provider'), AAPL should now be correctly marked as compliant
+    since it's a technology company that partners with financial institutions rather than
+    being a credit card issuer itself.
+    """
     with caplog.at_level(logging.DEBUG):
         run_islamic_compliance_test(
             symbol="AAPL",
-            expected_compliance=False,
-            expected_reasons=["Company's business description indicates involvement in financial services"]
+            expected_compliance=True,
+            expected_reasons=[]
         )
     # Print captured logs
     for record in caplog.records:
         print(record.message)
-
-    """Test AAPL compliance"""
-    run_islamic_compliance_test(
-        symbol="AAPL",
-        expected_compliance=False,
-        expected_reasons=["Company's business description indicates involvement in financial services"]
-    )
 
 def test_amzn_compliance():
     """Test AMZN compliance"""
