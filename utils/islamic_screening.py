@@ -73,6 +73,7 @@ def check_business_practices(info):
         'financial services': [
             'commercial bank', 'investment bank', 'mortgage', 'credit services',
             'credit card company', 'credit card issuer', 'credit card provider',
+            'credit card business', 'credit card services', 'credit card processing',
             'lending services', 'consumer lending', 'asset management', 
             'capital markets', 'insurance', 'investment brokerage', 
             'wealth management', 'retail banking', 'corporate banking', 
