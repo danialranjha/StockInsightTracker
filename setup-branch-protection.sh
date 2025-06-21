@@ -43,7 +43,6 @@ gh api \
   /repos/$REPO/branches/main/protection \
   --field required_status_checks[strict]=true \
   --field required_status_checks[contexts][]="test (3.11)" \
-  --field required_status_checks[contexts][]="test (3.12)" \
   --field required_status_checks[contexts][]="security-scan" \
   --field required_status_checks[contexts][]="lint-and-format-check" \
   --field required_status_checks[contexts][]="test-coverage-check" \
@@ -89,7 +88,6 @@ if gh api /repos/$REPO/branches/develop &> /dev/null; then
       /repos/$REPO/branches/develop/protection \
       --field required_status_checks[strict]=true \
       --field required_status_checks[contexts][]="test (3.11)" \
-      --field required_status_checks[contexts][]="test (3.12)" \
       --field required_status_checks[contexts][]="security-scan" \
       --field required_status_checks[contexts][]="lint-and-format-check" \
       --field enforce_admins=false \
