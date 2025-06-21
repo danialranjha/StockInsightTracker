@@ -1,5 +1,5 @@
 import logging
-
+import re
 from utils.calculations import calculate_debt_ratio
 
 
@@ -144,27 +144,25 @@ def check_business_practices(info):
         logging.debug(reason)
 
     for category, keywords in non_compliant_categories.items():
-        if any(keyword in company_name for keyword in keywords):
+        if any(re.search(r'\b' + re.escape(keyword) + r'\b', company_name, re.IGNORECASE) for keyword in keywords):
             reason = f"Company name indicates involvement in {category} business"
             if reason not in non_compliant_reasons:
                 non_compliant_reasons.append(reason)
                 logging.debug(reason)
-
-        if any(keyword in industry.lower() for keyword in keywords):
+        
+        if any(re.search(r'\b' + re.escape(keyword) + r'\b', industry, re.IGNORECASE) for keyword in keywords):
             reason = f"Company operates in {category} industry"
             if reason not in non_compliant_reasons:
                 non_compliant_reasons.append(reason)
                 logging.debug(reason)
-
-        if any(keyword in business_summary for keyword in keywords):
-            reason = (
-                f"Company's business description indicates involvement in {category}"
-            )
+        
+        if any(re.search(r'\b' + re.escape(keyword) + r'\b', business_summary, re.IGNORECASE) for keyword in keywords):
+            reason = f"Company's business description indicates involvement in {category}"
             if reason not in non_compliant_reasons:
                 non_compliant_reasons.append(reason)
                 logging.debug(reason)
-
-        if any(keyword in sector for keyword in keywords):
+        
+        if any(re.search(r'\b' + re.escape(keyword) + r'\b', sector, re.IGNORECASE) for keyword in keywords):
             reason = f"Company operates in {category} sector"
             if reason not in non_compliant_reasons:
                 non_compliant_reasons.append(reason)
