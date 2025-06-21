@@ -41,9 +41,17 @@ echo -e "${GREEN}Setting up branch protection for 'main' branch...${NC}"
 gh api \
   --method PUT \
   /repos/$REPO/branches/main/protection \
-  --field required_status_checks='{"strict":true,"contexts":["test (3.11)","test (3.12)","security-scan","lint-and-format-check","test-coverage-check"]}' \
+  --field required_status_checks[strict]=true \
+  --field required_status_checks[contexts][]="test (3.11)" \
+  --field required_status_checks[contexts][]="test (3.12)" \
+  --field required_status_checks[contexts][]="security-scan" \
+  --field required_status_checks[contexts][]="lint-and-format-check" \
+  --field required_status_checks[contexts][]="test-coverage-check" \
   --field enforce_admins=false \
-  --field required_pull_request_reviews='{"required_approving_review_count":1,"dismiss_stale_reviews":true,"require_code_owner_reviews":false,"require_last_push_approval":true}' \
+  --field required_pull_request_reviews[required_approving_review_count]=1 \
+  --field required_pull_request_reviews[dismiss_stale_reviews]=true \
+  --field required_pull_request_reviews[require_code_owner_reviews]=false \
+  --field required_pull_request_reviews[require_last_push_approval]=true \
   --field restrictions=null \
   --field allow_force_pushes=false \
   --field allow_deletions=false \
@@ -79,9 +87,15 @@ if gh api /repos/$REPO/branches/develop &> /dev/null; then
     gh api \
       --method PUT \
       /repos/$REPO/branches/develop/protection \
-      --field required_status_checks='{"strict":true,"contexts":["test (3.11)","test (3.12)","security-scan","lint-and-format-check"]}' \
+      --field required_status_checks[strict]=true \
+      --field required_status_checks[contexts][]="test (3.11)" \
+      --field required_status_checks[contexts][]="test (3.12)" \
+      --field required_status_checks[contexts][]="security-scan" \
+      --field required_status_checks[contexts][]="lint-and-format-check" \
       --field enforce_admins=false \
-      --field required_pull_request_reviews='{"required_approving_review_count":1,"dismiss_stale_reviews":true,"require_code_owner_reviews":false}' \
+      --field required_pull_request_reviews[required_approving_review_count]=1 \
+      --field required_pull_request_reviews[dismiss_stale_reviews]=true \
+      --field required_pull_request_reviews[require_code_owner_reviews]=false \
       --field restrictions=null \
       --field allow_force_pushes=false \
       --field allow_deletions=false
